@@ -68,6 +68,15 @@ body{
 .site-bar{height:100%; border-radius:4px; min-width:3px;}
 .site-profit{text-align:right; font-size:12.5px; font-weight:600;}
 
+.accounts{display:flex; flex-direction:column; gap:9px;}
+.account{background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:13px 14px;}
+.account-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+.account-name{font-size:14px; font-weight:600;}
+.account-sub{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.5px; margin-top:1px;}
+.account-solde{font-size:21px; font-weight:700; letter-spacing:-.5px;}
+.account-detail{color:var(--muted); font-size:11.5px; margin-top:9px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
+.account-detail b{color:var(--text); font-weight:600;}
+
 .filters{display:flex; gap:7px;}
 select{background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:7px 9px; font-size:12.5px; font-family:inherit;}
 
@@ -119,9 +128,12 @@ select{background:var(--surface-2); color:var(--text); border:1px solid var(--bo
 <script>
 /* ---------------- État & stockage local ---------------- */
 const KEY = "carnet_paris_v1";
+const MKEY = "carnet_mouvements_v1";
 let bets = [];
+let movements = [];
 try { bets = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ bets = []; }
-function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(bets)); }catch(e){} }
+try { movements = JSON.parse(localStorage.getItem(MKEY)) || []; } catch(e){ movements = []; }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(bets)); localStorage.setItem(MKEY, JSON.stringify(movements)); }catch(e){} }
 
 const SITES = ["Winamax","Betclic","Unibet","ParionsSport (FDJ)","PMU","Zebet","Vbet","Netbet","Bwin","Genybet"];
 const SPORTS = ["Football","Tennis","Basketball","Rugby","Formule 1","MMA","Hockey","Handball","Volley","eSport","Autre"];
@@ -132,6 +144,7 @@ const STATUTS = {
   void:{label:"Remboursé",color:"var(--muted)"},
   cashout:{label:"Cashout",color:"var(--accent)"}
 };
+const MOUV = { depot:{label:"Dépôt",color:"var(--gain)"}, retrait:{label:"Retrait",color:"var(--loss)"} };
 
 let filterSite = "all", filterStatut = "all";
 
@@ -159,10 +172,13 @@ function computeStats(){
   const winners = settled.filter(b=>profit(b)>0.0001);
   const engaged = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
   const potential = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0)*((parseFloat(b.cote)||0)-1),0);
+  const totalDepots = movements.filter(m=>m.type==="depot").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
+  const totalRetraits = movements.filter(m=>m.type==="retrait").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
+  const soldeTotal = totalDepots - totalRetraits + net - engaged;
   return {net,totalMise,roi:totalMise>0?net/totalMise*100:0,
     winRate:decided.length?winners.length/decided.length*100:0,
     nbSettled:settled.length,nbWinners:winners.length,nbDecided:decided.length,
-    nbPending:pending.length,engaged,potential};
+    nbPending:pending.length,engaged,potential,totalDepots,totalRetraits,soldeTotal};
 }
 function cumulative(){
   const s = bets.filter(b=>b.statut!=="pending")
@@ -171,13 +187,20 @@ function cumulative(){
 }
 function bySite(){
   const m={};
+  const get=k=>{ if(!m[k]) m[k]={site:k,profit:0,count:0,depots:0,retraits:0,pending:0}; return m[k]; };
   bets.forEach(b=>{
-    const k=b.site||"—";
-    if(!m[k]) m[k]={site:k,profit:0,count:0};
-    m[k].count++;
-    if(b.statut!=="pending") m[k].profit+=profit(b);
+    const o=get(b.site||"—");
+    o.count++;
+    if(b.statut==="pending") o.pending+=parseFloat(b.mise)||0;
+    else o.profit+=profit(b);
   });
-  return Object.values(m).sort((a,b)=>b.profit-a.profit);
+  movements.forEach(mv=>{
+    const o=get(mv.site||"—");
+    if(mv.type==="depot") o.depots+=parseFloat(mv.montant)||0;
+    else if(mv.type==="retrait") o.retraits+=parseFloat(mv.montant)||0;
+  });
+  Object.values(m).forEach(o=>{ o.solde = o.depots - o.retraits + o.profit - o.pending; });
+  return Object.values(m).sort((a,b)=>b.solde-a.solde);
 }
 
 /* ---------------- Graphe SVG ---------------- */
@@ -218,12 +241,14 @@ function render(){
     </div>
   </header>`;
 
-  if(bets.length===0){
+  if(bets.length===0 && movements.length===0){
     fab.style.display="none";
     app.innerHTML = header + `<div class="empty">
-      <div class="empty-big">Aucun pari enregistré</div>
-      <p>Ajoute ton premier pari pour lancer le suivi. Tout est stocké sur ton téléphone.</p>
-      <button class="btn primary" data-act="add">+ Ajouter un pari</button></div>`;
+      <div class="empty-big">Rien à suivre pour l'instant</div>
+      <p>Ajoute un pari, ou commence par enregistrer un dépôt sur un bookmaker. Tout est stocké sur ton téléphone.</p>
+      <button class="btn primary" data-act="add">+ Ajouter un pari</button>
+      <div style="height:10px"></div>
+      <button class="btn ghost" data-act="addmvt">+ Dépôt / retrait</button></div>`;
     return;
   }
   fab.style.display="block";
@@ -242,7 +267,7 @@ function render(){
 
   const cards=`<section class="cards">
     ${stat("Taux de réussite",`${s.winRate.toFixed(0)} %`,`${s.nbWinners} / ${s.nbDecided} gagnants`)}
-    ${stat("Total misé",eur(s.totalMise),"sur paris réglés")}
+    ${stat("Solde disponible",eur(s.soldeTotal),"à parier, tous sites",s.soldeTotal<0?"var(--loss)":"var(--text)")}
     ${stat("En attente",eur(s.engaged),`${s.nbPending} pari(s) engagé(s)`,"var(--accent)")}
     ${stat("Gain potentiel",eurS(s.potential),"si tout passe","var(--accent)")}
   </section>`;
@@ -252,15 +277,29 @@ function render(){
     </div>${chartSVG()}</section>`;
 
   const sites=bySite();
-  const maxAbs=Math.max(...sites.map(x=>Math.abs(x.profit)),1);
-  const sitesHTML=`<section class="panel"><div class="panel-head"><h2>Par bookmaker</h2></div>
-    <div class="sites">${sites.map(x=>{
+  const sitesHTML=`<section class="panel">
+    <div class="panel-head"><h2>Comptes bookmakers</h2>
+      <button class="mini" data-act="addmvt">+ Dépôt / retrait</button></div>
+    <div class="accounts">${sites.map(x=>{
       const pc=x.profit>0?"var(--gain)":x.profit<0?"var(--loss)":"var(--muted)";
-      return `<div class="site-row">
-        <div class="site-name">${esc(x.site)}</div>
-        <div class="site-track"><div class="site-bar" style="width:${Math.min(100,Math.abs(x.profit)/maxAbs*100)}%;background:${x.profit>=0?"var(--gain)":"var(--loss)"}"></div></div>
-        <div class="site-profit num" style="color:${pc}">${eurS(x.profit)}</div></div>`;
+      return `<div class="account">
+        <div class="account-top">
+          <div><div class="account-name">${esc(x.site)}</div><div class="account-sub">Reste à parier</div></div>
+          <div class="account-solde num" style="color:${x.solde<0?"var(--loss)":"var(--text)"}">${eur(x.solde)}</div>
+        </div>
+        <div class="account-detail">
+          <span>Déposé <b class="num">${eur(x.depots)}</b></span><span class="dot">·</span>
+          <span>Retiré <b class="num">${eur(x.retraits)}</b></span><span class="dot">·</span>
+          <span>Paris <b class="num" style="color:${pc}">${eurS(x.profit)}</b></span>
+          ${x.pending>0?`<span class="dot">·</span><span>Engagé <b class="num">${eur(x.pending)}</b></span>`:""}
+        </div></div>`;
     }).join("")}</div></section>`;
+
+  const mvtList=[...movements].sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id.localeCompare(a.id));
+  const mvtHTML=`<section class="panel">
+    <div class="panel-head"><h2>Mouvements</h2><span class="panel-hint">${movements.length} opération(s)</span></div>
+    <div class="bets">${mvtList.length?mvtList.map(mvtCard).join(""):'<div class="empty-sm">Aucun dépôt ni retrait enregistré.</div>'}</div>
+  </section>`;
 
   const siteOpts=[...new Set(bets.map(b=>b.site))].map(x=>`<option value="${esc(x)}" ${filterSite===x?"selected":""}>${esc(x)}</option>`).join("");
   const statOpts=Object.entries(STATUTS).map(([k,v])=>`<option value="${k}" ${filterStatut===k?"selected":""}>${v.label}</option>`).join("");
@@ -279,7 +318,25 @@ function render(){
     <div class="bets">${list.length?list.map(betCard).join(""):'<div class="empty-sm">Aucun pari pour ce filtre.</div>'}</div>
   </section>`;
 
-  app.innerHTML = header+hero+cards+chart+sitesHTML+listHTML;
+  app.innerHTML = header+hero+cards+chart+sitesHTML+mvtHTML+listHTML;
+}
+
+function mvtCard(mv){
+  const t=MOUV[mv.type]||MOUV.depot;
+  const val=(parseFloat(mv.montant)||0)*(mv.type==="retrait"?-1:1);
+  return `<div class="bet">
+    <div class="bet-line1">
+      <span class="bet-event">${esc(mv.site)}</span>
+      <span class="badge" style="color:${t.color};border-color:${t.color}">${t.label}</span>
+    </div>
+    <div class="bet-line2"><span>${mv.date}</span>${mv.note?`<span class="dot">·</span><span>${esc(mv.note)}</span>`:""}</div>
+    <div class="bet-bottom">
+      <div class="bet-profit num" style="color:var(--text)">${eurS(val)}</div>
+      <div class="bet-tools">
+        <button class="icon-btn" data-medit="${mv.id}">✎</button>
+        <button class="icon-btn" data-mdel="${mv.id}">✕</button>
+      </div></div>
+  </div>`;
 }
 
 function stat(label,value,sub,accent){
@@ -382,17 +439,66 @@ function openModal(existing){
   };
 }
 
+/* ---------------- Modale mouvement ---------------- */
+function openMouv(existing){
+  const knownSites=[...new Set([...SITES,...bets.map(b=>b.site),...movements.map(m=>m.site)])].filter(Boolean);
+  const m = existing || {date:new Date().toISOString().slice(0,10),site:knownSites[0],type:"depot",montant:"",note:""};
+  const isCustom = m.site && !knownSites.includes(m.site);
+  const siteOpts = knownSites.map(s=>`<option ${m.site===s?"selected":""}>${esc(s)}</option>`).join("")+`<option value="__custom__" ${isCustom?"selected":""}>Autre…</option>`;
+  const typeOpts = Object.entries(MOUV).map(([k,v])=>`<option value="${k}" ${m.type===k?"selected":""}>${v.label}</option>`).join("");
+
+  const ov=document.createElement("div");
+  ov.className="overlay";
+  ov.innerHTML=`<div class="modal">
+    <div class="modal-head"><h3>${existing?"Modifier le mouvement":"Dépôt / retrait"}</h3>
+      <button class="icon-btn" data-close>✕</button></div>
+    <div class="grid2">
+      <label class="field"><span class="field-label">Date</span><input type="date" id="m-date" value="${m.date}"></label>
+      <label class="field"><span class="field-label">Type</span><select id="m-type">${typeOpts}</select></label>
+    </div>
+    <label class="field"><span class="field-label">Bookmaker</span><select id="m-site">${siteOpts}</select></label>
+    <label class="field" id="m-wrap-custom" style="display:${isCustom?"flex":"none"}"><span class="field-label">Nom du site</span><input id="m-custom" value="${isCustom?esc(m.site):""}" placeholder="Ex. Feelingbet"></label>
+    <label class="field"><span class="field-label">Montant (€)</span><input type="number" inputmode="decimal" step="0.01" min="0" id="m-montant" value="${m.montant}" placeholder="50"></label>
+    <label class="field"><span class="field-label">Note (facultatif)</span><input id="m-note" value="${esc(m.note||"")}" placeholder="Ex. bonus de bienvenue"></label>
+    <div class="modal-actions">
+      <button class="btn ghost" data-close>Annuler</button>
+      <button class="btn primary" id="m-save">${existing?"Enregistrer":"Ajouter"}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+
+  const $=id=>ov.querySelector(id);
+  const siteSel=$("#m-site"), customWrap=$("#m-wrap-custom");
+  siteSel.onchange=()=>{ customWrap.style.display=siteSel.value==="__custom__"?"flex":"none"; };
+  ov.querySelectorAll("[data-close]").forEach(el=>el.onclick=()=>ov.remove());
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+
+  $("#m-save").onclick=()=>{
+    const site = siteSel.value==="__custom__" ? $("#m-custom").value.trim() : siteSel.value;
+    const montant=$("#m-montant").value;
+    if(!site||!montant){ alert("Renseigne le site et le montant."); return; }
+    const rec={ id: existing?existing.id:uid(), date:$("#m-date").value, site,
+      type:$("#m-type").value, montant, note:$("#m-note").value.trim() };
+    if(existing) movements=movements.map(x=>x.id===existing.id?rec:x);
+    else movements.push(rec);
+    persist(); ov.remove(); render();
+  };
+}
+
 /* ---------------- Actions ---------------- */
 document.getElementById("fab").onclick=()=>openModal(null);
 
 document.getElementById("app").addEventListener("click",e=>{
   const t=e.target;
   if(t.dataset.act==="add") openModal(null);
+  if(t.dataset.act==="addmvt") openMouv(null);
   if(t.dataset.act==="export") exportJSON();
   if(t.dataset.act==="import") document.getElementById("importFile").click();
   if(t.dataset.set){ const b=bets.find(x=>x.id===t.dataset.id); if(b){b.statut=t.dataset.set; persist(); render();} }
   if(t.dataset.edit){ const b=bets.find(x=>x.id===t.dataset.edit); if(b) openModal(b); }
   if(t.dataset.del){ if(confirm("Supprimer ce pari ?")){ bets=bets.filter(x=>x.id!==t.dataset.del); persist(); render(); } }
+  if(t.dataset.medit){ const mv=movements.find(x=>x.id===t.dataset.medit); if(mv) openMouv(mv); }
+  if(t.dataset.mdel){ if(confirm("Supprimer ce mouvement ?")){ movements=movements.filter(x=>x.id!==t.dataset.mdel); persist(); render(); } }
 });
 document.getElementById("app").addEventListener("change",e=>{
   const f=e.target.dataset.filter;
@@ -402,7 +508,8 @@ document.getElementById("app").addEventListener("change",e=>{
 });
 
 function exportJSON(){
-  const blob=new Blob([JSON.stringify(bets,null,2)],{type:"application/json"});
+  const payload={version:2, exportedAt:new Date().toISOString(), bets, movements};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
   a.href=url; a.download=`carnet-paris-${new Date().toISOString().slice(0,10)}.json`; a.click();
@@ -414,11 +521,13 @@ document.getElementById("importFile").addEventListener("change",e=>{
   r.onload=()=>{
     try{
       const data=JSON.parse(r.result);
-      if(Array.isArray(data)){
-        if(confirm(`Importer ${data.length} pari(s) ? Cela remplace les données actuelles.`)){
-          bets=data; persist(); render();
-        }
-      } else alert("Fichier invalide.");
+      let newBets, newMvts;
+      if(Array.isArray(data)){ newBets=data; newMvts=[]; }          // ancien format : paris seuls
+      else if(data && Array.isArray(data.bets)){ newBets=data.bets; newMvts=Array.isArray(data.movements)?data.movements:[]; }
+      else { alert("Fichier invalide."); return; }
+      if(confirm(`Importer ${newBets.length} pari(s) et ${newMvts.length} mouvement(s) ? Cela remplace les données actuelles.`)){
+        bets=newBets; movements=newMvts; persist(); render();
+      }
     }catch(err){ alert("Impossible de lire ce fichier."); }
     e.target.value="";
   };
