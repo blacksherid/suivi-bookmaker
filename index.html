@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Carnet de mise">
+<meta name="theme-color" content="#0E1116">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEHElEQVR42u3d205TQRSA4TWTXpseKKg9eEB4Bh9HUJ8Kqj6OzyAK2oLP4UVDYwhtgc7svQ7/f2UM0Wbmy+rulHanZ719IbqvzBIQOAgcBA4CB4GDwEHgIHAQOAgcROAgcBA4CBwEDlJVRySxCsTkIHBQsacVnlWIyUHgoHJPKzyrEJODwEHgIHAQOAgcBA4CB4GDwsbvcxCTg8BB4CBwEDgIHGTupSyvZInJQeAgcBA4Gu7v12MWYVXqDp6zCstubmWMTn6wGkyOe2Tc+TM4kHG89W/AgQx8gONhAoL7SN3Bi8Ayjh7yY6OTCyYHMnb9SXDEkhHZR0YGPsBRYI+j+cjIwAc4iu1rHB8ZGfgIjaPGXkbwkZGBj3Wl7p7nE9KbL9X3b3Tq9vw0I8PE/wIOq3vm1UdGBj4C4Whrn/z5yMjAx4ZXKy8dyXin4WGMTn8yOZCh/ZHsOjl6LibHtb79GNufHxkZoR5VLBxl9+Dow3d8OMFRQwY+POCoNzPwYRtH7WcTfFjF0cx1Bj4yMrg+dYKj+dcmkX1kZODDPI52zzNi+sjIwMe6Um+o/b2V65miM9CLb+8LPpjxR9Xvv2RktDk/ZqrnR+oNR4plHKqSUW1+/GJyOJFRYX4cgsOJjDg+MjLwYQaHFRkRfGRk4MMADosyfPvIyMDHulJfwTnHwriMVWXPPyZtn3+omBxlV6HsDoWVoehpxboPfzJ0XZDa9eFShrqXshZ9eJUhCg/BbPlwLEN0Hp9b8eFbhqh9402/D/cyRPNb9pp9RJAhIqk/HIviFrO3Bf+1IudjpWVcql381N9XjUNEFueKfBSW8elS88ob+O3zsiu4y+6GkiFWPpqgwUc0GWLoQ03t+ggoQ2x9HLItHzFliLkPUjfvI6wMsfgVDE36iCxDjH55SzM+gssQu1/7VNsHMsT0F8bV84EM8zgq+UDGKgPH51sre76ODCeTQ/MeWJchImlgf3Ism2uaH1P7MsTTLTX07IcPGcvJMRFHzc/ftC3jys1ieruNV7t740mGuLwBYFs75EyGeL11aPP75E+GOL7pcJO75VKGiKTBwUT8Nj+rfn06/XzldfU838u+gZ1zLMM/jqr751tGCByVdtG9jCg4iu9lBBmBcBTc0SAyYuEosq9xZITDsePuhpIREceT9ziajKA4nrDTAWXExfGo/Y4pQ0TS4GAqgZufvd4m43fYxckSu817H1kGODYJCC4DHGsdIENE0l7sa47/+3N7/fEKGUyOOy1NIIPJQUwOAgfVqCOJRSAmB4GDwEHgIHAQOAgc5KKOcNBBTA4CB4GDwEHgIHAQOAgcBA6KWofzUWJy0OMnB2+tEJODwEHgoEauObjoICYHgYPAQeAgcBA4CBwEDgIHgYMIHAQOAgeBg8BBmvoH17qXnEOpXhgAAAAASUVORK5CYII=">
+<link rel="manifest" href='data:application/json,{"name":"Carnet de mise","short_name":"Carnet","display":"standalone","background_color":"%230E1116","theme_color":"%230E1116","icons":[{"src":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEHElEQVR42u3d205TQRSA4TWTXpseKKg9eEB4Bh9HUJ8Kqj6OzyAK2oLP4UVDYwhtgc7svQ7/f2UM0Wbmy+rulHanZ719IbqvzBIQOAgcBA4CB4GDwEHgIHAQOAgcROAgcBA4CBwEDlJVRySxCsTkIHBQsacVnlWIyUHgoHJPKzyrEJODwEHgIHAQOAgcBA4CB4GDwsbvcxCTg8BB4CBwEDgIHGTupSyvZInJQeAgcBA4Gu7v12MWYVXqDp6zCstubmWMTn6wGkyOe2Tc+TM4kHG89W/AgQx8gONhAoL7SN3Bi8Ayjh7yY6OTCyYHMnb9SXDEkhHZR0YGPsBRYI+j+cjIwAc4iu1rHB8ZGfgIjaPGXkbwkZGBj3Wl7p7nE9KbL9X3b3Tq9vw0I8PE/wIOq3vm1UdGBj4C4Whrn/z5yMjAx4ZXKy8dyXin4WGMTn8yOZCh/ZHsOjl6LibHtb79GNufHxkZoR5VLBxl9+Dow3d8OMFRQwY+POCoNzPwYRtH7WcTfFjF0cx1Bj4yMrg+dYKj+dcmkX1kZODDPI52zzNi+sjIwMe6Um+o/b2V65miM9CLb+8LPpjxR9Xvv2RktDk/ZqrnR+oNR4plHKqSUW1+/GJyOJFRYX4cgsOJjDg+MjLwYQaHFRkRfGRk4MMADosyfPvIyMDHulJfwTnHwriMVWXPPyZtn3+omBxlV6HsDoWVoehpxboPfzJ0XZDa9eFShrqXshZ9eJUhCg/BbPlwLEN0Hp9b8eFbhqh9402/D/cyRPNb9pp9RJAhIqk/HIviFrO3Bf+1IudjpWVcql381N9XjUNEFueKfBSW8elS88ob+O3zsiu4y+6GkiFWPpqgwUc0GWLoQ03t+ggoQ2x9HLItHzFliLkPUjfvI6wMsfgVDE36iCxDjH55SzM+gssQu1/7VNsHMsT0F8bV84EM8zgq+UDGKgPH51sre76ODCeTQ/MeWJchImlgf3Ism2uaH1P7MsTTLTX07IcPGcvJMRFHzc/ftC3jys1ieruNV7t740mGuLwBYFs75EyGeL11aPP75E+GOL7pcJO75VKGiKTBwUT8Nj+rfn06/XzldfU838u+gZ1zLMM/jqr751tGCByVdtG9jCg4iu9lBBmBcBTc0SAyYuEosq9xZITDsePuhpIREceT9ziajKA4nrDTAWXExfGo/Y4pQ0TS4GAqgZufvd4m43fYxckSu817H1kGODYJCC4DHGsdIENE0l7sa47/+3N7/fEKGUyOOy1NIIPJQUwOAgfVqCOJRSAmB4GDwEHgIHAQOAgc5KKOcNBBTA4CB4GDwEHgIHAQOAgcBA6KWofzUWJy0OMnB2+tEJODwEHgoEauObjoICYHgYPAQeAgcBA4CBwEDgIHgYMIHAQOAgeBg8BBmvoH17qXnEOpXhgAAAAASUVORK5CYII=","sizes":"180x180","type":"image/png"}]}'>
+<title>Carnet de mise</title>
+<style>
+:root{
+  --bg:#0E1116; --surface:#161A21; --surface-2:#1D222B; --border:#272E39;
+  --text:#E7EAEE; --muted:#8A93A2; --gain:#2FD98A; --loss:#F6516B;
+  --accent:#F5B23E; --pending:#7A8496;
+  --safe-t:env(safe-area-inset-top); --safe-b:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg); color:var(--text);
+  padding:calc(var(--safe-t) + 14px) 14px calc(var(--safe-b) + 96px);
+  max-width:760px; margin:0 auto; min-height:100vh;
+}
+.num{font-variant-numeric:tabular-nums; font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;}
+
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; gap:10px;}
+.brand{display:flex; align-items:center; gap:11px;}
+.brand-mark{color:var(--accent); font-size:19px;}
+.brand-name{font-weight:600; font-size:16px; letter-spacing:-.2px;}
+.brand-sub{color:var(--muted); font-size:11.5px;}
+.icon-actions{display:flex; gap:6px;}
+
+.btn{border-radius:9px; padding:9px 14px; font-size:13.5px; font-weight:600; cursor:pointer; border:1px solid transparent; font-family:inherit;}
+.btn.primary{background:var(--accent); color:#1A1206;}
+.btn.primary:disabled{opacity:.4;}
+.btn.ghost{background:transparent; color:var(--text); border:1px solid var(--border);}
+.mini{padding:7px 11px; font-size:12.5px; border-radius:8px; background:var(--surface-2); border:1px solid var(--border); color:var(--text);}
+
+.hero{background:linear-gradient(180deg,var(--surface),var(--bg)); border:1px solid var(--border); border-radius:16px; padding:22px 20px; margin-bottom:12px;}
+.hero-label{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:1.4px;}
+.hero-value{font-size:42px; font-weight:700; letter-spacing:-1.5px; margin:3px 0 7px; font-variant-numeric:tabular-nums; font-family:ui-monospace,"SF Mono",Menlo,monospace;}
+.hero-meta{color:var(--muted); font-size:13px; display:flex; gap:7px; flex-wrap:wrap; align-items:center;}
+.dot{color:var(--border);}
+
+.cards{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;}
+.stat{background:var(--surface); border:1px solid var(--border); border-radius:13px; padding:14px;}
+.stat-label{color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.6px;}
+.stat-value{font-size:22px; font-weight:600; margin:5px 0 3px; letter-spacing:-.5px;}
+.stat-sub{color:var(--muted); font-size:11px;}
+
+.panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px;}
+.panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap;}
+.panel-head h2{font-size:14px; font-weight:600; margin:0;}
+.panel-hint{color:var(--muted); font-size:11.5px;}
+
+.chart{width:100%; height:170px; display:block;}
+.chart-empty{color:var(--muted); font-size:13px; text-align:center; padding:40px 0;}
+
+.sites{display:flex; flex-direction:column; gap:10px;}
+.site-row{display:grid; grid-template-columns:96px 1fr 86px; align-items:center; gap:10px;}
+.site-name{font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.site-track{height:7px; background:var(--surface-2); border-radius:4px; overflow:hidden;}
+.site-bar{height:100%; border-radius:4px; min-width:3px;}
+.site-profit{text-align:right; font-size:12.5px; font-weight:600;}
+
+.filters{display:flex; gap:7px;}
+select{background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:7px 9px; font-size:12.5px; font-family:inherit;}
+
+.bets{display:flex; flex-direction:column; gap:8px;}
+.bet{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:12px;}
+.bet-line1{display:flex; align-items:center; gap:8px; margin-bottom:4px;}
+.bet-event{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;}
+.badge{font-size:10px; font-weight:600; padding:2px 7px; border:1px solid; border-radius:20px; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap;}
+.bet-line2{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:11.5px; flex-wrap:wrap; margin-bottom:8px;}
+.bet-bottom{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.bet-profit{font-size:15px; font-weight:700;}
+.quick{display:flex; gap:5px;}
+.q{border-radius:7px; padding:6px 11px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; font-family:inherit;}
+.q-win{color:var(--gain);} .q-lose{color:var(--loss);} .q-void{color:var(--muted);}
+.bet-tools{display:flex; gap:2px;}
+.icon-btn{background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:6px 8px; border-radius:6px; font-family:inherit;}
+
+.empty{text-align:center; padding:56px 20px; color:var(--muted);}
+.empty-big{font-size:18px; color:var(--text); font-weight:600; margin-bottom:6px;}
+.empty p{margin:0 auto 18px; max-width:320px; font-size:13.5px;}
+.empty-sm{color:var(--muted); font-size:13px; text-align:center; padding:18px;}
+
+.fab{position:fixed; right:16px; bottom:calc(var(--safe-b) + 18px); z-index:40;
+  width:auto; padding:15px 20px; border-radius:16px; background:var(--accent); color:#1A1206;
+  border:none; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.45);}
+
+.overlay{position:fixed; inset:0; background:rgba(6,8,11,.72); display:flex; align-items:flex-end; justify-content:center; z-index:50; backdrop-filter:blur(3px);}
+.modal{background:var(--surface); border:1px solid var(--border); border-radius:18px 18px 0 0; padding:20px 18px calc(var(--safe-b) + 20px); width:100%; max-width:520px; max-height:92vh; overflow-y:auto;}
+.modal-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+.modal-head h3{margin:0; font-size:17px;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
+.field{display:flex; flex-direction:column; gap:5px; margin-bottom:12px;}
+.field-label{font-size:12px; color:var(--muted);}
+.field input,.field select{background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:10px; padding:12px 12px; font-size:16px; width:100%; font-family:inherit;}
+.field input:focus,.field select:focus{outline:none; border-color:var(--accent);}
+.hint-box{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:11px 12px; font-size:12.5px; color:var(--muted); margin-bottom:12px;}
+.modal-actions{display:flex; gap:8px; margin-top:4px;}
+.modal-actions .btn{flex:1; padding:13px;}
+
+@media(min-width:560px){ .cards{grid-template-columns:repeat(4,1fr);} .overlay{align-items:center;} .modal{border-radius:18px;} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<button class="fab" id="fab" style="display:none">+ Pari</button>
+<input type="file" id="importFile" accept="application/json" style="display:none">
+
+<script>
+/* ---------------- État & stockage local ---------------- */
+const KEY = "carnet_paris_v1";
+let bets = [];
+try { bets = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ bets = []; }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(bets)); }catch(e){} }
+
+const SITES = ["Winamax","Betclic","Unibet","ParionsSport (FDJ)","PMU","Zebet","Vbet","Netbet","Bwin","Genybet"];
+const SPORTS = ["Football","Tennis","Basketball","Rugby","Formule 1","MMA","Hockey","Handball","Volley","eSport","Autre"];
+const STATUTS = {
+  pending:{label:"En attente",color:"var(--pending)"},
+  won:{label:"Gagné",color:"var(--gain)"},
+  lost:{label:"Perdu",color:"var(--loss)"},
+  void:{label:"Remboursé",color:"var(--muted)"},
+  cashout:{label:"Cashout",color:"var(--accent)"}
+};
+
+let filterSite = "all", filterStatut = "all";
+
+/* ---------------- Helpers ---------------- */
+function profit(b){
+  const m = parseFloat(b.mise)||0, c = parseFloat(b.cote)||0;
+  if(b.statut==="won") return m*(c-1);
+  if(b.statut==="lost") return -m;
+  if(b.statut==="cashout") return (parseFloat(b.cashout)||0)-m;
+  return 0;
+}
+const fmt = n => Math.abs(n).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const eur = n => (n<0?"−":"") + fmt(n) + " €";
+const eurS = n => (n>0?"+":n<0?"−":"") + fmt(n) + " €";
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc = s => (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------------- Calculs ---------------- */
+function computeStats(){
+  const settled = bets.filter(b=>b.statut!=="pending");
+  const pending = bets.filter(b=>b.statut==="pending");
+  const totalMise = settled.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
+  const net = settled.reduce((s,b)=>s+profit(b),0);
+  const decided = settled.filter(b=>["won","lost","cashout"].includes(b.statut));
+  const winners = settled.filter(b=>profit(b)>0.0001);
+  const engaged = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
+  const potential = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0)*((parseFloat(b.cote)||0)-1),0);
+  return {net,totalMise,roi:totalMise>0?net/totalMise*100:0,
+    winRate:decided.length?winners.length/decided.length*100:0,
+    nbSettled:settled.length,nbWinners:winners.length,nbDecided:decided.length,
+    nbPending:pending.length,engaged,potential};
+}
+function cumulative(){
+  const s = bets.filter(b=>b.statut!=="pending")
+    .sort((a,b)=>new Date(a.date)-new Date(b.date)||a.id.localeCompare(b.id));
+  let c=0; return s.map(b=>{c+=profit(b); return c;});
+}
+function bySite(){
+  const m={};
+  bets.forEach(b=>{
+    const k=b.site||"—";
+    if(!m[k]) m[k]={site:k,profit:0,count:0};
+    m[k].count++;
+    if(b.statut!=="pending") m[k].profit+=profit(b);
+  });
+  return Object.values(m).sort((a,b)=>b.profit-a.profit);
+}
+
+/* ---------------- Graphe SVG ---------------- */
+function chartSVG(){
+  const pts=[0,...cumulative()];
+  if(pts.length<2) return '<div class="chart-empty">Le graphe apparaîtra dès ton premier pari réglé.</div>';
+  const W=320,H=150,pad=8;
+  const min=Math.min(...pts,0), max=Math.max(...pts,0);
+  const range=(max-min)||1;
+  const x=i=>pad+i/(pts.length-1)*(W-2*pad);
+  const y=v=>H-pad-(v-min)/range*(H-2*pad);
+  const line=pts.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const zeroY=y(0).toFixed(1);
+  const area=`${x(0).toFixed(1)},${zeroY} ${line} ${x(pts.length-1).toFixed(1)},${zeroY}`;
+  const last=pts[pts.length-1];
+  const col=last>=0?"var(--gain)":"var(--loss)";
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    <line x1="${pad}" y1="${zeroY}" x2="${W-pad}" y2="${zeroY}" stroke="var(--border)" stroke-width="1"/>
+    <polygon points="${area}" fill="url(#ga)"/>
+    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ---------------- Rendu ---------------- */
+function render(){
+  const app=document.getElementById("app");
+  const fab=document.getElementById("fab");
+  const header=`<header class="topbar">
+    <div class="brand"><span class="brand-mark">◆</span>
+      <div><div class="brand-name">Carnet de mise</div><div class="brand-sub">Suivi multi-bookmakers</div></div>
+    </div>
+    <div class="icon-actions">
+      <button class="mini" data-act="import">Importer</button>
+      <button class="mini" data-act="export">Exporter</button>
+    </div>
+  </header>`;
+
+  if(bets.length===0){
+    fab.style.display="none";
+    app.innerHTML = header + `<div class="empty">
+      <div class="empty-big">Aucun pari enregistré</div>
+      <p>Ajoute ton premier pari pour lancer le suivi. Tout est stocké sur ton téléphone.</p>
+      <button class="btn primary" data-act="add">+ Ajouter un pari</button></div>`;
+    return;
+  }
+  fab.style.display="block";
+
+  const s=computeStats();
+  const col=s.net>0?"var(--gain)":s.net<0?"var(--loss)":"var(--text)";
+
+  const hero=`<section class="hero">
+    <div class="hero-label">Résultat net</div>
+    <div class="hero-value" style="color:${col}">${eurS(s.net)}</div>
+    <div class="hero-meta">
+      <span>ROI <b style="color:${col}">${s.roi>0?"+":""}${s.roi.toFixed(1)} %</b></span>
+      <span class="dot">·</span><span>${eur(s.totalMise)} misés</span>
+      <span class="dot">·</span><span>${s.nbSettled} réglés</span>
+    </div></section>`;
+
+  const cards=`<section class="cards">
+    ${stat("Taux de réussite",`${s.winRate.toFixed(0)} %`,`${s.nbWinners} / ${s.nbDecided} gagnants`)}
+    ${stat("Total misé",eur(s.totalMise),"sur paris réglés")}
+    ${stat("En attente",eur(s.engaged),`${s.nbPending} pari(s) engagé(s)`,"var(--accent)")}
+    ${stat("Gain potentiel",eurS(s.potential),"si tout passe","var(--accent)")}
+  </section>`;
+
+  const chart=`<section class="panel"><div class="panel-head">
+    <h2>Évolution du résultat</h2><span class="panel-hint">cumul, pari après pari</span>
+    </div>${chartSVG()}</section>`;
+
+  const sites=bySite();
+  const maxAbs=Math.max(...sites.map(x=>Math.abs(x.profit)),1);
+  const sitesHTML=`<section class="panel"><div class="panel-head"><h2>Par bookmaker</h2></div>
+    <div class="sites">${sites.map(x=>{
+      const pc=x.profit>0?"var(--gain)":x.profit<0?"var(--loss)":"var(--muted)";
+      return `<div class="site-row">
+        <div class="site-name">${esc(x.site)}</div>
+        <div class="site-track"><div class="site-bar" style="width:${Math.min(100,Math.abs(x.profit)/maxAbs*100)}%;background:${x.profit>=0?"var(--gain)":"var(--loss)"}"></div></div>
+        <div class="site-profit num" style="color:${pc}">${eurS(x.profit)}</div></div>`;
+    }).join("")}</div></section>`;
+
+  const siteOpts=[...new Set(bets.map(b=>b.site))].map(x=>`<option value="${esc(x)}" ${filterSite===x?"selected":""}>${esc(x)}</option>`).join("");
+  const statOpts=Object.entries(STATUTS).map(([k,v])=>`<option value="${k}" ${filterStatut===k?"selected":""}>${v.label}</option>`).join("");
+
+  const list=bets
+    .filter(b=>filterSite==="all"||b.site===filterSite)
+    .filter(b=>filterStatut==="all"||b.statut===filterStatut)
+    .sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id.localeCompare(a.id));
+
+  const listHTML=`<section class="panel"><div class="panel-head">
+    <h2>Historique</h2>
+    <div class="filters">
+      <select data-filter="statut"><option value="all" ${filterStatut==="all"?"selected":""}>Tous statuts</option>${statOpts}</select>
+      <select data-filter="site"><option value="all" ${filterSite==="all"?"selected":""}>Tous sites</option>${siteOpts}</select>
+    </div></div>
+    <div class="bets">${list.length?list.map(betCard).join(""):'<div class="empty-sm">Aucun pari pour ce filtre.</div>'}</div>
+  </section>`;
+
+  app.innerHTML = header+hero+cards+chart+sitesHTML+listHTML;
+}
+
+function stat(label,value,sub,accent){
+  return `<div class="stat"><div class="stat-label">${label}</div>
+    <div class="stat-value num" ${accent?`style="color:${accent}"`:""}>${value}</div>
+    <div class="stat-sub">${sub}</div></div>`;
+}
+
+function betCard(b){
+  const p=profit(b), st=STATUTS[b.statut];
+  const right = b.statut==="pending"
+    ? `<div class="quick">
+         <button class="q q-win" data-set="won" data-id="${b.id}">Gagné</button>
+         <button class="q q-lose" data-set="lost" data-id="${b.id}">Perdu</button>
+         <button class="q q-void" data-set="void" data-id="${b.id}">Remb.</button>
+       </div>`
+    : `<div class="bet-profit num" style="color:${p>0?"var(--gain)":p<0?"var(--loss)":"var(--muted)"}">${eurS(p)}</div>`;
+  return `<div class="bet">
+    <div class="bet-line1">
+      <span class="bet-event">${esc(b.event)||"Pari"}</span>
+      <span class="badge" style="color:${st.color};border-color:${st.color}">${st.label}</span>
+    </div>
+    <div class="bet-line2">
+      <span>${b.date}</span><span class="dot">·</span><span>${esc(b.site)}</span>
+      ${b.sport?`<span class="dot">·</span><span>${esc(b.sport)}</span>`:""}
+      <span class="dot">·</span><span class="num">${(parseFloat(b.mise)||0).toFixed(2)} € @ ${(parseFloat(b.cote)||0).toFixed(2)}</span>
+    </div>
+    <div class="bet-bottom">${right}
+      <div class="bet-tools">
+        <button class="icon-btn" data-edit="${b.id}">✎</button>
+        <button class="icon-btn" data-del="${b.id}">✕</button>
+      </div></div>
+  </div>`;
+}
+
+/* ---------------- Modale ---------------- */
+function openModal(existing){
+  const b = existing || {date:new Date().toISOString().slice(0,10),site:SITES[0],sport:SPORTS[0],event:"",mise:"",cote:"",statut:"pending",cashout:""};
+  const isCustom = b.site && !SITES.includes(b.site);
+  const siteOpts = SITES.map(s=>`<option ${b.site===s?"selected":""}>${s}</option>`).join("")+`<option value="__custom__" ${isCustom?"selected":""}>Autre…</option>`;
+  const sportOpts = SPORTS.map(s=>`<option ${b.sport===s?"selected":""}>${s}</option>`).join("");
+  const statOpts = Object.entries(STATUTS).map(([k,v])=>`<option value="${k}" ${b.statut===k?"selected":""}>${v.label}</option>`).join("");
+
+  const ov=document.createElement("div");
+  ov.className="overlay";
+  ov.innerHTML=`<div class="modal">
+    <div class="modal-head"><h3>${existing?"Modifier le pari":"Nouveau pari"}</h3>
+      <button class="icon-btn" data-close>✕</button></div>
+    <div class="grid2">
+      <label class="field"><span class="field-label">Date</span><input type="date" id="f-date" value="${b.date}"></label>
+      <label class="field"><span class="field-label">Sport</span><select id="f-sport">${sportOpts}</select></label>
+    </div>
+    <label class="field"><span class="field-label">Bookmaker</span><select id="f-site">${siteOpts}</select></label>
+    <label class="field" id="wrap-custom" style="display:${isCustom?"flex":"none"}"><span class="field-label">Nom du site</span><input id="f-custom" value="${isCustom?esc(b.site):""}" placeholder="Ex. Feelingbet"></label>
+    <label class="field"><span class="field-label">Évènement / description</span><input id="f-event" value="${esc(b.event)}" placeholder="Ex. PSG – OM, victoire PSG"></label>
+    <div class="grid2">
+      <label class="field"><span class="field-label">Mise (€)</span><input type="number" inputmode="decimal" step="0.01" min="0" id="f-mise" value="${b.mise}" placeholder="10"></label>
+      <label class="field"><span class="field-label">Cote</span><input type="number" inputmode="decimal" step="0.01" min="1" id="f-cote" value="${b.cote}" placeholder="1.85"></label>
+    </div>
+    <label class="field"><span class="field-label">Statut</span><select id="f-statut">${statOpts}</select></label>
+    <label class="field" id="wrap-cash" style="display:${b.statut==="cashout"?"flex":"none"}"><span class="field-label">Montant récupéré (€)</span><input type="number" inputmode="decimal" step="0.01" min="0" id="f-cash" value="${b.cashout||""}" placeholder="14.50"></label>
+    <div class="hint-box" id="hint" style="display:none"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" data-close>Annuler</button>
+      <button class="btn primary" id="save">${existing?"Enregistrer":"Ajouter"}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+
+  const $=id=>ov.querySelector(id);
+  const siteSel=$("#f-site"), customWrap=$("#wrap-custom"), statSel=$("#f-statut"), cashWrap=$("#wrap-cash"), hint=$("#hint");
+  const refreshHint=()=>{
+    const m=parseFloat($("#f-mise").value)||0, c=parseFloat($("#f-cote").value)||0;
+    if(m&&c&&statSel.value==="pending"){
+      hint.style.display="block";
+      hint.innerHTML=`Gain potentiel : <b style="color:var(--gain)">${eurS(m*(c-1))}</b> · Retour total <b>${eur(m*c)}</b>`;
+    } else hint.style.display="none";
+  };
+  siteSel.onchange=()=>{ customWrap.style.display=siteSel.value==="__custom__"?"flex":"none"; };
+  statSel.onchange=()=>{ cashWrap.style.display=statSel.value==="cashout"?"flex":"none"; refreshHint(); };
+  $("#f-mise").oninput=refreshHint; $("#f-cote").oninput=refreshHint;
+  refreshHint();
+
+  ov.querySelectorAll("[data-close]").forEach(el=>el.onclick=()=>ov.remove());
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+
+  $("#save").onclick=()=>{
+    const site = siteSel.value==="__custom__" ? $("#f-custom").value.trim() : siteSel.value;
+    const mise=$("#f-mise").value, cote=$("#f-cote").value;
+    if(!site||!mise||!cote){ alert("Renseigne au moins le site, la mise et la cote."); return; }
+    const rec={
+      id: existing?existing.id:uid(),
+      date:$("#f-date").value, site, sport:$("#f-sport").value,
+      event:$("#f-event").value.trim(), mise, cote,
+      statut:statSel.value, cashout:statSel.value==="cashout"?$("#f-cash").value:""
+    };
+    if(existing) bets=bets.map(x=>x.id===existing.id?rec:x);
+    else bets.push(rec);
+    persist(); ov.remove(); render();
+  };
+}
+
+/* ---------------- Actions ---------------- */
+document.getElementById("fab").onclick=()=>openModal(null);
+
+document.getElementById("app").addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.act==="add") openModal(null);
+  if(t.dataset.act==="export") exportJSON();
+  if(t.dataset.act==="import") document.getElementById("importFile").click();
+  if(t.dataset.set){ const b=bets.find(x=>x.id===t.dataset.id); if(b){b.statut=t.dataset.set; persist(); render();} }
+  if(t.dataset.edit){ const b=bets.find(x=>x.id===t.dataset.edit); if(b) openModal(b); }
+  if(t.dataset.del){ if(confirm("Supprimer ce pari ?")){ bets=bets.filter(x=>x.id!==t.dataset.del); persist(); render(); } }
+});
+document.getElementById("app").addEventListener("change",e=>{
+  const f=e.target.dataset.filter;
+  if(f==="site") filterSite=e.target.value;
+  if(f==="statut") filterStatut=e.target.value;
+  render();
+});
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(bets,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`carnet-paris-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+document.getElementById("importFile").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(Array.isArray(data)){
+        if(confirm(`Importer ${data.length} pari(s) ? Cela remplace les données actuelles.`)){
+          bets=data; persist(); render();
+        }
+      } else alert("Fichier invalide.");
+    }catch(err){ alert("Impossible de lire ce fichier."); }
+    e.target.value="";
+  };
+  r.readAsText(file);
+});
+
+render();
+</script>
+</body>
+</html>
