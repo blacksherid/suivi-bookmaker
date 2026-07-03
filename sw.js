@@ -1,5 +1,5 @@
 /* Carnet de mise — service worker (hors-ligne) */
-const CACHE = "carnet-v3";
+const CACHE = "carnet-v4";
 const ASSETS = ["./", "./index.html"];
 
 self.addEventListener("install", (e) => {
