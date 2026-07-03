@@ -28,7 +28,7 @@ body{
 }
 .num{font-variant-numeric:tabular-nums; font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,monospace;}
 
-.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; gap:10px;}
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:10px;}
 .brand{display:flex; align-items:center; gap:11px;}
 .brand-mark{color:var(--accent); font-size:19px;}
 .brand-name{font-weight:600; font-size:16px; letter-spacing:-.2px;}
@@ -39,7 +39,12 @@ body{
 .btn.primary{background:var(--accent); color:#1A1206;}
 .btn.primary:disabled{opacity:.4;}
 .btn.ghost{background:transparent; color:var(--text); border:1px solid var(--border);}
-.mini{padding:7px 11px; font-size:12.5px; border-radius:8px; background:var(--surface-2); border:1px solid var(--border); color:var(--text);}
+.mini{padding:7px 10px; font-size:12px; border-radius:8px; background:var(--surface-2); border:1px solid var(--border); color:var(--text); cursor:pointer; font-family:inherit;}
+
+.periods{display:flex; gap:6px; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+.chip{white-space:nowrap; padding:8px 14px; border-radius:20px; font-size:12.5px; font-weight:600;
+  background:var(--surface); border:1px solid var(--border); color:var(--muted); cursor:pointer; font-family:inherit;}
+.chip.active{background:var(--accent); color:#1A1206; border-color:var(--accent);}
 
 .hero{background:linear-gradient(180deg,var(--surface),var(--bg)); border:1px solid var(--border); border-radius:16px; padding:22px 20px; margin-bottom:12px;}
 .hero-label{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:1.4px;}
@@ -53,6 +58,11 @@ body{
 .stat-value{font-size:22px; font-weight:600; margin:5px 0 3px; letter-spacing:-.5px;}
 .stat-sub{color:var(--muted); font-size:11px;}
 
+.metrics{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:12px;}
+.metric{background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:11px 10px; text-align:center;}
+.metric-value{font-size:16px; font-weight:700; letter-spacing:-.3px;}
+.metric-label{color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.4px; margin-top:3px;}
+
 .panel{background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px;}
 .panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap;}
 .panel-head h2{font-size:14px; font-weight:600; margin:0;}
@@ -62,8 +72,9 @@ body{
 .chart-empty{color:var(--muted); font-size:13px; text-align:center; padding:40px 0;}
 
 .sites{display:flex; flex-direction:column; gap:10px;}
-.site-row{display:grid; grid-template-columns:96px 1fr 86px; align-items:center; gap:10px;}
+.site-row{display:grid; grid-template-columns:104px 1fr 84px; align-items:center; gap:10px;}
 .site-name{font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.site-sub{color:var(--muted); font-size:10.5px;}
 .site-track{height:7px; background:var(--surface-2); border-radius:4px; overflow:hidden;}
 .site-bar{height:100%; border-radius:4px; min-width:3px;}
 .site-profit{text-align:right; font-size:12.5px; font-weight:600;}
@@ -77,7 +88,7 @@ body{
 .account-detail{color:var(--muted); font-size:11.5px; margin-top:9px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;}
 .account-detail b{color:var(--text); font-weight:600;}
 
-.filters{display:flex; gap:7px;}
+.filters{display:flex; gap:7px; flex-wrap:wrap;}
 select{background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:7px 9px; font-size:12.5px; font-family:inherit;}
 
 .bets{display:flex; flex-direction:column; gap:8px;}
@@ -85,6 +96,7 @@ select{background:var(--surface-2); color:var(--text); border:1px solid var(--bo
 .bet-line1{display:flex; align-items:center; gap:8px; margin-bottom:4px;}
 .bet-event{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;}
 .badge{font-size:10px; font-weight:600; padding:2px 7px; border:1px solid; border-radius:20px; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap;}
+.badge-soft{font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; background:var(--surface); color:var(--muted); white-space:nowrap;}
 .bet-line2{display:flex; align-items:center; gap:6px; color:var(--muted); font-size:11.5px; flex-wrap:wrap; margin-bottom:8px;}
 .bet-bottom{display:flex; justify-content:space-between; align-items:center; gap:10px;}
 .bet-profit{font-size:15px; font-weight:700;}
@@ -118,6 +130,7 @@ select{background:var(--surface-2); color:var(--text); border:1px solid var(--bo
 .modal-actions .btn{flex:1; padding:13px;}
 
 @media(min-width:560px){ .cards{grid-template-columns:repeat(4,1fr);} .overlay{align-items:center;} .modal{border-radius:18px;} }
+@media(max-width:400px){ .metrics{grid-template-columns:1fr 1fr;} }
 </style>
 </head>
 <body>
@@ -144,9 +157,12 @@ const STATUTS = {
   void:{label:"Remboursé",color:"var(--muted)"},
   cashout:{label:"Cashout",color:"var(--accent)"}
 };
-const MOUV = { depot:{label:"Dépôt",color:"var(--gain)"}, retrait:{label:"Retrait",color:"var(--loss)"} };
+const BET_TYPES = { simple:"Simple", combine:"Combiné" };
+const MOUV = { depot:{label:"Dépôt",color:"var(--gain)"}, retrait:{label:"Retrait",color:"var(--loss)"}, bonus:{label:"Bonus",color:"var(--accent)"} };
+const PERIODS = { all:"Depuis le début", month:"Ce mois-ci", days30:"30 jours", year:"Cette année" };
 
-let filterSite = "all", filterStatut = "all";
+let period = "all";
+let filterSite = "all", filterStatut = "all", filterType = "all";
 
 /* ---------------- Helpers ---------------- */
 function profit(b){
@@ -161,52 +177,96 @@ const eur = n => (n<0?"−":"") + fmt(n) + " €";
 const eurS = n => (n>0?"+":n<0?"−":"") + fmt(n) + " €";
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc = s => (s||"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const betType = b => b.type==="combine" ? "combine" : "simple";
 
-/* ---------------- Calculs ---------------- */
-function computeStats(){
-  const settled = bets.filter(b=>b.statut!=="pending");
-  const pending = bets.filter(b=>b.statut==="pending");
+function inPeriod(dateStr){
+  if(period==="all") return true;
+  const d=new Date(dateStr); if(isNaN(d)) return true;
+  const now=new Date();
+  if(period==="month") return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  if(period==="year") return d.getFullYear()===now.getFullYear();
+  if(period==="days30"){ const diff=(now-d)/86400000; return diff<=30 && diff>=-1; }
+  return true;
+}
+const betsPeriod = () => bets.filter(b=>inPeriod(b.date));
+const movementsPeriod = () => movements.filter(m=>inPeriod(m.date));
+
+/* ---------------- Stats de performance (sur une liste) ---------------- */
+function computeStats(list){
+  const settled = list.filter(b=>b.statut!=="pending");
+  const pending = list.filter(b=>b.statut==="pending");
   const totalMise = settled.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
   const net = settled.reduce((s,b)=>s+profit(b),0);
   const decided = settled.filter(b=>["won","lost","cashout"].includes(b.statut));
   const winners = settled.filter(b=>profit(b)>0.0001);
   const engaged = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
   const potential = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0)*((parseFloat(b.cote)||0)-1),0);
-  const totalDepots = movements.filter(m=>m.type==="depot").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
-  const totalRetraits = movements.filter(m=>m.type==="retrait").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
-  const soldeTotal = totalDepots - totalRetraits + net - engaged;
   return {net,totalMise,roi:totalMise>0?net/totalMise*100:0,
     winRate:decided.length?winners.length/decided.length*100:0,
     nbSettled:settled.length,nbWinners:winners.length,nbDecided:decided.length,
-    nbPending:pending.length,engaged,potential,totalDepots,totalRetraits,soldeTotal};
-}
-function cumulative(){
-  const s = bets.filter(b=>b.statut!=="pending")
-    .sort((a,b)=>new Date(a.date)-new Date(b.date)||a.id.localeCompare(b.id));
-  let c=0; return s.map(b=>{c+=profit(b); return c;});
-}
-function bySite(){
-  const m={};
-  const get=k=>{ if(!m[k]) m[k]={site:k,profit:0,count:0,depots:0,retraits:0,pending:0}; return m[k]; };
-  bets.forEach(b=>{
-    const o=get(b.site||"—");
-    o.count++;
-    if(b.statut==="pending") o.pending+=parseFloat(b.mise)||0;
-    else o.profit+=profit(b);
-  });
-  movements.forEach(mv=>{
-    const o=get(mv.site||"—");
-    if(mv.type==="depot") o.depots+=parseFloat(mv.montant)||0;
-    else if(mv.type==="retrait") o.retraits+=parseFloat(mv.montant)||0;
-  });
-  Object.values(m).forEach(o=>{ o.solde = o.depots - o.retraits + o.profit - o.pending; });
-  return Object.values(m).sort((a,b)=>b.solde-a.solde);
+    nbPending:pending.length,engaged,potential};
 }
 
-/* ---------------- Graphe SVG ---------------- */
-function chartSVG(){
-  const pts=[0,...cumulative()];
-  if(pts.length<2) return '<div class="chart-empty">Le graphe apparaîtra dès ton premier pari réglé.</div>';
+/* ---------------- Trésorerie (toujours globale, état courant) ---------------- */
+function computeTreso(){
+  const totalDepots = movements.filter(m=>m.type==="depot").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
+  const totalRetraits = movements.filter(m=>m.type==="retrait").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
+  const totalBonus = movements.filter(m=>m.type==="bonus").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
+  const settled = bets.filter(b=>b.statut!=="pending");
+  const net = settled.reduce((s,b)=>s+profit(b),0);
+  const engaged = bets.filter(b=>b.statut==="pending").reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
+  const soldeTotal = totalDepots + totalBonus - totalRetraits + net - engaged;
+  return {totalDepots,totalRetraits,totalBonus,soldeTotal};
+}
+
+/* ---------------- Métriques avancées (sur une liste) ---------------- */
+function advanced(list){
+  const settled = list.filter(b=>b.statut!=="pending");
+  const coteAvg = settled.length ? settled.reduce((s,b)=>s+(parseFloat(b.cote)||0),0)/settled.length : 0;
+  const miseAvg = settled.length ? settled.reduce((s,b)=>s+(parseFloat(b.mise)||0),0)/settled.length : 0;
+  const wonBets = list.filter(b=>b.statut==="won");
+  const biggestOdds = wonBets.length ? Math.max(...wonBets.map(b=>parseFloat(b.cote)||0)) : 0;
+  // série en cours
+  const decided = settled.filter(b=>["won","lost","cashout"].includes(b.statut))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id.localeCompare(a.id));
+  let streakN=0, streakType=null;
+  if(decided.length){
+    streakType = profit(decided[0])>0 ? "win":"lose";
+    for(const b of decided){ const s=profit(b)>0?"win":"lose"; if(s===streakType) streakN++; else break; }
+  }
+  return {coteAvg,miseAvg,biggestOdds,streakN,streakType};
+}
+
+/* ---------------- Répartitions ---------------- */
+function bySiteTreso(){
+  const m={};
+  const get=k=>{ if(!m[k]) m[k]={site:k,profit:0,pending:0,depots:0,retraits:0,bonus:0}; return m[k]; };
+  bets.forEach(b=>{ const o=get(b.site||"—"); if(b.statut==="pending") o.pending+=parseFloat(b.mise)||0; else o.profit+=profit(b); });
+  movements.forEach(mv=>{ const o=get(mv.site||"—");
+    if(mv.type==="depot") o.depots+=parseFloat(mv.montant)||0;
+    else if(mv.type==="retrait") o.retraits+=parseFloat(mv.montant)||0;
+    else if(mv.type==="bonus") o.bonus+=parseFloat(mv.montant)||0; });
+  Object.values(m).forEach(o=>{ o.solde=o.depots+o.bonus-o.retraits+o.profit-o.pending; });
+  return Object.values(m).sort((a,b)=>b.solde-a.solde);
+}
+function groupProfit(list, keyFn){
+  const m={};
+  list.filter(b=>b.statut!=="pending").forEach(b=>{
+    const k=keyFn(b)||"—";
+    if(!m[k]) m[k]={key:k,profit:0,count:0};
+    m[k].profit+=profit(b); m[k].count++;
+  });
+  return Object.values(m).sort((a,b)=>b.profit-a.profit);
+}
+
+/* ---------------- Graphe SVG (sur une liste) ---------------- */
+function cumulative(list){
+  const s=list.filter(b=>b.statut!=="pending").sort((a,b)=>new Date(a.date)-new Date(b.date)||a.id.localeCompare(b.id));
+  let c=0; return s.map(b=>{c+=profit(b); return c;});
+}
+function chartSVG(list){
+  const pts=[0,...cumulative(list)];
+  if(pts.length<2) return '<div class="chart-empty">Le graphe apparaîtra dès ton premier pari réglé sur la période.</div>';
   const W=320,H=150,pad=8;
   const min=Math.min(...pts,0), max=Math.max(...pts,0);
   const range=(max-min)||1;
@@ -236,6 +296,7 @@ function render(){
       <div><div class="brand-name">Carnet de mise</div><div class="brand-sub">Suivi multi-bookmakers</div></div>
     </div>
     <div class="icon-actions">
+      <button class="mini" data-act="csv">CSV</button>
       <button class="mini" data-act="import">Importer</button>
       <button class="mini" data-act="export">Exporter</button>
     </div>
@@ -253,11 +314,17 @@ function render(){
   }
   fab.style.display="block";
 
-  const s=computeStats();
+  const bp=betsPeriod();
+  const s=computeStats(bp);
+  const t=computeTreso();
+  const adv=advanced(bp);
   const col=s.net>0?"var(--gain)":s.net<0?"var(--loss)":"var(--text)";
 
+  const periodBar=`<div class="periods">${Object.entries(PERIODS).map(([k,v])=>
+    `<button class="chip ${period===k?"active":""}" data-period="${k}">${v}</button>`).join("")}</div>`;
+
   const hero=`<section class="hero">
-    <div class="hero-label">Résultat net</div>
+    <div class="hero-label">Résultat net · ${PERIODS[period].toLowerCase()}</div>
     <div class="hero-value" style="color:${col}">${eurS(s.net)}</div>
     <div class="hero-meta">
       <span>ROI <b style="color:${col}">${s.roi>0?"+":""}${s.roi.toFixed(1)} %</b></span>
@@ -267,16 +334,25 @@ function render(){
 
   const cards=`<section class="cards">
     ${stat("Taux de réussite",`${s.winRate.toFixed(0)} %`,`${s.nbWinners} / ${s.nbDecided} gagnants`)}
-    ${stat("Solde disponible",eur(s.soldeTotal),"à parier, tous sites",s.soldeTotal<0?"var(--loss)":"var(--text)")}
-    ${stat("En attente",eur(s.engaged),`${s.nbPending} pari(s) engagé(s)`,"var(--accent)")}
+    ${stat("Solde disponible",eur(t.soldeTotal),"actuel, tous sites",t.soldeTotal<0?"var(--loss)":"var(--text)")}
+    ${stat("En attente",eur(s.engaged),`${s.nbPending} pari(s) en cours`,"var(--accent)")}
     ${stat("Gain potentiel",eurS(s.potential),"si tout passe","var(--accent)")}
+  </section>`;
+
+  const streakTxt = adv.streakN ? `${adv.streakN} ${adv.streakType==="win"?"gagné"+(adv.streakN>1?"s":""):"perdu"+(adv.streakN>1?"s":"")}` : "—";
+  const streakCol = adv.streakN ? (adv.streakType==="win"?"var(--gain)":"var(--loss)") : "var(--text)";
+  const metrics=`<section class="metrics">
+    <div class="metric"><div class="metric-value num">${adv.coteAvg?adv.coteAvg.toFixed(2):"—"}</div><div class="metric-label">Cote moy.</div></div>
+    <div class="metric"><div class="metric-value num">${adv.miseAvg?eur(adv.miseAvg):"—"}</div><div class="metric-label">Mise moy.</div></div>
+    <div class="metric"><div class="metric-value num">${adv.biggestOdds?adv.biggestOdds.toFixed(2):"—"}</div><div class="metric-label">Cote gagnée max</div></div>
+    <div class="metric"><div class="metric-value" style="color:${streakCol}">${streakTxt}</div><div class="metric-label">Série en cours</div></div>
   </section>`;
 
   const chart=`<section class="panel"><div class="panel-head">
     <h2>Évolution du résultat</h2><span class="panel-hint">cumul, pari après pari</span>
-    </div>${chartSVG()}</section>`;
+    </div>${chartSVG(bp)}</section>`;
 
-  const sites=bySite();
+  const sites=bySiteTreso();
   const sitesHTML=`<section class="panel">
     <div class="panel-head"><h2>Comptes bookmakers</h2>
       <button class="mini" data-act="addmvt">+ Dépôt / retrait</button></div>
@@ -289,54 +365,58 @@ function render(){
         </div>
         <div class="account-detail">
           <span>Déposé <b class="num">${eur(x.depots)}</b></span><span class="dot">·</span>
+          ${x.bonus>0?`<span>Bonus <b class="num">${eur(x.bonus)}</b></span><span class="dot">·</span>`:""}
           <span>Retiré <b class="num">${eur(x.retraits)}</b></span><span class="dot">·</span>
           <span>Paris <b class="num" style="color:${pc}">${eurS(x.profit)}</b></span>
           ${x.pending>0?`<span class="dot">·</span><span>Engagé <b class="num">${eur(x.pending)}</b></span>`:""}
         </div></div>`;
     }).join("")}</div></section>`;
 
-  const mvtList=[...movements].sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id.localeCompare(a.id));
+  // Répartition par sport + par type (sur la période)
+  const sports=groupProfit(bp, b=>b.sport);
+  const types=groupProfit(bp, b=>BET_TYPES[betType(b)]);
+  const maxSport=Math.max(...sports.map(x=>Math.abs(x.profit)),1);
+  const bar=(x,maxAbs)=>{
+    const pc=x.profit>0?"var(--gain)":x.profit<0?"var(--loss)":"var(--muted)";
+    return `<div class="site-row">
+      <div><div class="site-name">${esc(x.key)}</div><div class="site-sub">${x.count} pari(s)</div></div>
+      <div class="site-track"><div class="site-bar" style="width:${Math.min(100,Math.abs(x.profit)/maxAbs*100)}%;background:${x.profit>=0?"var(--gain)":"var(--loss)"}"></div></div>
+      <div class="site-profit num" style="color:${pc}">${eurS(x.profit)}</div></div>`;
+  };
+  const repHTML = (sports.length||types.length) ? `<section class="panel">
+    <div class="panel-head"><h2>Répartition</h2><span class="panel-hint">${PERIODS[period].toLowerCase()}</span></div>
+    ${sports.length?`<div class="sites">${sports.map(x=>bar(x,maxSport)).join("")}</div>`:""}
+    ${types.length?`<div style="height:14px"></div><div class="panel-hint" style="margin-bottom:8px">Simples vs combinés</div>
+      <div class="sites">${types.map(x=>bar(x,Math.max(...types.map(y=>Math.abs(y.profit)),1))).join("")}</div>`:""}
+  </section>` : "";
+
+  // Mouvements (période)
+  const mvtList=movementsPeriod().sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id.localeCompare(a.id));
   const mvtHTML=`<section class="panel">
-    <div class="panel-head"><h2>Mouvements</h2><span class="panel-hint">${movements.length} opération(s)</span></div>
-    <div class="bets">${mvtList.length?mvtList.map(mvtCard).join(""):'<div class="empty-sm">Aucun dépôt ni retrait enregistré.</div>'}</div>
+    <div class="panel-head"><h2>Mouvements</h2><span class="panel-hint">${mvtList.length} opération(s)</span></div>
+    <div class="bets">${mvtList.length?mvtList.map(mvtCard).join(""):'<div class="empty-sm">Aucun mouvement sur cette période.</div>'}</div>
   </section>`;
 
+  // Historique paris (période + filtres)
   const siteOpts=[...new Set(bets.map(b=>b.site))].map(x=>`<option value="${esc(x)}" ${filterSite===x?"selected":""}>${esc(x)}</option>`).join("");
   const statOpts=Object.entries(STATUTS).map(([k,v])=>`<option value="${k}" ${filterStatut===k?"selected":""}>${v.label}</option>`).join("");
-
-  const list=bets
+  const typeOpts=Object.entries(BET_TYPES).map(([k,v])=>`<option value="${k}" ${filterType===k?"selected":""}>${v}</option>`).join("");
+  const list=bp
     .filter(b=>filterSite==="all"||b.site===filterSite)
     .filter(b=>filterStatut==="all"||b.statut===filterStatut)
+    .filter(b=>filterType==="all"||betType(b)===filterType)
     .sort((a,b)=>new Date(b.date)-new Date(a.date)||b.id.localeCompare(a.id));
-
   const listHTML=`<section class="panel"><div class="panel-head">
     <h2>Historique</h2>
     <div class="filters">
       <select data-filter="statut"><option value="all" ${filterStatut==="all"?"selected":""}>Tous statuts</option>${statOpts}</select>
+      <select data-filter="type"><option value="all" ${filterType==="all"?"selected":""}>Tous types</option>${typeOpts}</select>
       <select data-filter="site"><option value="all" ${filterSite==="all"?"selected":""}>Tous sites</option>${siteOpts}</select>
     </div></div>
-    <div class="bets">${list.length?list.map(betCard).join(""):'<div class="empty-sm">Aucun pari pour ce filtre.</div>'}</div>
+    <div class="bets">${list.length?list.map(betCard).join(""):'<div class="empty-sm">Aucun pari pour ces filtres.</div>'}</div>
   </section>`;
 
-  app.innerHTML = header+hero+cards+chart+sitesHTML+mvtHTML+listHTML;
-}
-
-function mvtCard(mv){
-  const t=MOUV[mv.type]||MOUV.depot;
-  const val=(parseFloat(mv.montant)||0)*(mv.type==="retrait"?-1:1);
-  return `<div class="bet">
-    <div class="bet-line1">
-      <span class="bet-event">${esc(mv.site)}</span>
-      <span class="badge" style="color:${t.color};border-color:${t.color}">${t.label}</span>
-    </div>
-    <div class="bet-line2"><span>${mv.date}</span>${mv.note?`<span class="dot">·</span><span>${esc(mv.note)}</span>`:""}</div>
-    <div class="bet-bottom">
-      <div class="bet-profit num" style="color:var(--text)">${eurS(val)}</div>
-      <div class="bet-tools">
-        <button class="icon-btn" data-medit="${mv.id}">✎</button>
-        <button class="icon-btn" data-mdel="${mv.id}">✕</button>
-      </div></div>
-  </div>`;
+  app.innerHTML = header+periodBar+hero+cards+metrics+chart+sitesHTML+repHTML+mvtHTML+listHTML;
 }
 
 function stat(label,value,sub,accent){
@@ -347,6 +427,7 @@ function stat(label,value,sub,accent){
 
 function betCard(b){
   const p=profit(b), st=STATUTS[b.statut];
+  const tp=betType(b);
   const right = b.statut==="pending"
     ? `<div class="quick">
          <button class="q q-win" data-set="won" data-id="${b.id}">Gagné</button>
@@ -357,6 +438,7 @@ function betCard(b){
   return `<div class="bet">
     <div class="bet-line1">
       <span class="bet-event">${esc(b.event)||"Pari"}</span>
+      ${tp==="combine"?`<span class="badge-soft">Combiné${b.selections?" ×"+b.selections:""}</span>`:""}
       <span class="badge" style="color:${st.color};border-color:${st.color}">${st.label}</span>
     </div>
     <div class="bet-line2">
@@ -372,13 +454,33 @@ function betCard(b){
   </div>`;
 }
 
-/* ---------------- Modale ---------------- */
+function mvtCard(mv){
+  const tinfo=MOUV[mv.type]||MOUV.depot;
+  const val=(parseFloat(mv.montant)||0)*(mv.type==="retrait"?-1:1);
+  return `<div class="bet">
+    <div class="bet-line1">
+      <span class="bet-event">${esc(mv.site)}</span>
+      <span class="badge" style="color:${tinfo.color};border-color:${tinfo.color}">${tinfo.label}</span>
+    </div>
+    <div class="bet-line2"><span>${mv.date}</span>${mv.note?`<span class="dot">·</span><span>${esc(mv.note)}</span>`:""}</div>
+    <div class="bet-bottom">
+      <div class="bet-profit num" style="color:var(--text)">${eurS(val)}</div>
+      <div class="bet-tools">
+        <button class="icon-btn" data-medit="${mv.id}">✎</button>
+        <button class="icon-btn" data-mdel="${mv.id}">✕</button>
+      </div></div>
+  </div>`;
+}
+
+/* ---------------- Modale pari ---------------- */
 function openModal(existing){
-  const b = existing || {date:new Date().toISOString().slice(0,10),site:SITES[0],sport:SPORTS[0],event:"",mise:"",cote:"",statut:"pending",cashout:""};
+  const b = existing || {date:new Date().toISOString().slice(0,10),site:SITES[0],sport:SPORTS[0],event:"",mise:"",cote:"",statut:"pending",cashout:"",type:"simple",selections:""};
   const isCustom = b.site && !SITES.includes(b.site);
   const siteOpts = SITES.map(s=>`<option ${b.site===s?"selected":""}>${s}</option>`).join("")+`<option value="__custom__" ${isCustom?"selected":""}>Autre…</option>`;
   const sportOpts = SPORTS.map(s=>`<option ${b.sport===s?"selected":""}>${s}</option>`).join("");
   const statOpts = Object.entries(STATUTS).map(([k,v])=>`<option value="${k}" ${b.statut===k?"selected":""}>${v.label}</option>`).join("");
+  const typeOpts = Object.entries(BET_TYPES).map(([k,v])=>`<option value="${k}" ${betType(b)===k?"selected":""}>${v}</option>`).join("");
+  const isComb = betType(b)==="combine";
 
   const ov=document.createElement("div");
   ov.className="overlay";
@@ -393,8 +495,12 @@ function openModal(existing){
     <label class="field" id="wrap-custom" style="display:${isCustom?"flex":"none"}"><span class="field-label">Nom du site</span><input id="f-custom" value="${isCustom?esc(b.site):""}" placeholder="Ex. Feelingbet"></label>
     <label class="field"><span class="field-label">Évènement / description</span><input id="f-event" value="${esc(b.event)}" placeholder="Ex. PSG – OM, victoire PSG"></label>
     <div class="grid2">
+      <label class="field"><span class="field-label">Type de pari</span><select id="f-type">${typeOpts}</select></label>
+      <label class="field" id="wrap-sel" style="display:${isComb?"flex":"none"}"><span class="field-label">Nb de sélections</span><input type="number" inputmode="numeric" min="2" id="f-sel" value="${b.selections||""}" placeholder="3"></label>
+    </div>
+    <div class="grid2">
       <label class="field"><span class="field-label">Mise (€)</span><input type="number" inputmode="decimal" step="0.01" min="0" id="f-mise" value="${b.mise}" placeholder="10"></label>
-      <label class="field"><span class="field-label">Cote</span><input type="number" inputmode="decimal" step="0.01" min="1" id="f-cote" value="${b.cote}" placeholder="1.85"></label>
+      <label class="field"><span class="field-label">Cote${isComb?" globale":""}</span><input type="number" inputmode="decimal" step="0.01" min="1" id="f-cote" value="${b.cote}" placeholder="1.85"></label>
     </div>
     <label class="field"><span class="field-label">Statut</span><select id="f-statut">${statOpts}</select></label>
     <label class="field" id="wrap-cash" style="display:${b.statut==="cashout"?"flex":"none"}"><span class="field-label">Montant récupéré (€)</span><input type="number" inputmode="decimal" step="0.01" min="0" id="f-cash" value="${b.cashout||""}" placeholder="14.50"></label>
@@ -407,7 +513,7 @@ function openModal(existing){
   document.body.appendChild(ov);
 
   const $=id=>ov.querySelector(id);
-  const siteSel=$("#f-site"), customWrap=$("#wrap-custom"), statSel=$("#f-statut"), cashWrap=$("#wrap-cash"), hint=$("#hint");
+  const siteSel=$("#f-site"), customWrap=$("#wrap-custom"), statSel=$("#f-statut"), cashWrap=$("#wrap-cash"), hint=$("#hint"), typeSel=$("#f-type"), selWrap=$("#wrap-sel"), coteLabel=$("#f-cote").previousElementSibling;
   const refreshHint=()=>{
     const m=parseFloat($("#f-mise").value)||0, c=parseFloat($("#f-cote").value)||0;
     if(m&&c&&statSel.value==="pending"){
@@ -417,6 +523,7 @@ function openModal(existing){
   };
   siteSel.onchange=()=>{ customWrap.style.display=siteSel.value==="__custom__"?"flex":"none"; };
   statSel.onchange=()=>{ cashWrap.style.display=statSel.value==="cashout"?"flex":"none"; refreshHint(); };
+  typeSel.onchange=()=>{ const c=typeSel.value==="combine"; selWrap.style.display=c?"flex":"none"; };
   $("#f-mise").oninput=refreshHint; $("#f-cote").oninput=refreshHint;
   refreshHint();
 
@@ -427,11 +534,13 @@ function openModal(existing){
     const site = siteSel.value==="__custom__" ? $("#f-custom").value.trim() : siteSel.value;
     const mise=$("#f-mise").value, cote=$("#f-cote").value;
     if(!site||!mise||!cote){ alert("Renseigne au moins le site, la mise et la cote."); return; }
+    const type=typeSel.value;
     const rec={
       id: existing?existing.id:uid(),
       date:$("#f-date").value, site, sport:$("#f-sport").value,
       event:$("#f-event").value.trim(), mise, cote,
-      statut:statSel.value, cashout:statSel.value==="cashout"?$("#f-cash").value:""
+      statut:statSel.value, cashout:statSel.value==="cashout"?$("#f-cash").value:"",
+      type, selections: type==="combine" ? ($("#f-sel").value||"") : ""
     };
     if(existing) bets=bets.map(x=>x.id===existing.id?rec:x);
     else bets.push(rec);
@@ -490,9 +599,11 @@ document.getElementById("fab").onclick=()=>openModal(null);
 
 document.getElementById("app").addEventListener("click",e=>{
   const t=e.target;
+  if(t.dataset.period){ period=t.dataset.period; render(); return; }
   if(t.dataset.act==="add") openModal(null);
   if(t.dataset.act==="addmvt") openMouv(null);
   if(t.dataset.act==="export") exportJSON();
+  if(t.dataset.act==="csv") exportCSV();
   if(t.dataset.act==="import") document.getElementById("importFile").click();
   if(t.dataset.set){ const b=bets.find(x=>x.id===t.dataset.id); if(b){b.statut=t.dataset.set; persist(); render();} }
   if(t.dataset.edit){ const b=bets.find(x=>x.id===t.dataset.edit); if(b) openModal(b); }
@@ -504,15 +615,32 @@ document.getElementById("app").addEventListener("change",e=>{
   const f=e.target.dataset.filter;
   if(f==="site") filterSite=e.target.value;
   if(f==="statut") filterStatut=e.target.value;
+  if(f==="type") filterType=e.target.value;
   render();
 });
 
+/* ---------------- Export / import ---------------- */
 function exportJSON(){
-  const payload={version:2, exportedAt:new Date().toISOString(), bets, movements};
+  const payload={version:3, exportedAt:new Date().toISOString(), bets, movements};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
   a.href=url; a.download=`carnet-paris-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+function exportCSV(){
+  const q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+  const head=["Date","Bookmaker","Sport","Type","Evenement","Mise","Cote","Statut","Profit"];
+  const rows=bets.slice().sort((a,b)=>new Date(a.date)-new Date(b.date)).map(b=>[
+    b.date,b.site,b.sport||"",BET_TYPES[betType(b)],b.event||"",
+    (parseFloat(b.mise)||0).toFixed(2),(parseFloat(b.cote)||0).toFixed(2),
+    (STATUTS[b.statut]||{}).label||b.statut, profit(b).toFixed(2)
+  ]);
+  const csv=[head, ...rows].map(r=>r.map(q).join(";")).join("\r\n");
+  const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=`carnet-paris-${new Date().toISOString().slice(0,10)}.csv`; a.click();
   URL.revokeObjectURL(url);
 }
 document.getElementById("importFile").addEventListener("change",e=>{
@@ -522,7 +650,7 @@ document.getElementById("importFile").addEventListener("change",e=>{
     try{
       const data=JSON.parse(r.result);
       let newBets, newMvts;
-      if(Array.isArray(data)){ newBets=data; newMvts=[]; }          // ancien format : paris seuls
+      if(Array.isArray(data)){ newBets=data; newMvts=[]; }
       else if(data && Array.isArray(data.bets)){ newBets=data.bets; newMvts=Array.isArray(data.movements)?data.movements:[]; }
       else { alert("Fichier invalide."); return; }
       if(confirm(`Importer ${newBets.length} pari(s) et ${newMvts.length} mouvement(s) ? Cela remplace les données actuelles.`)){
@@ -533,6 +661,11 @@ document.getElementById("importFile").addEventListener("change",e=>{
   };
   r.readAsText(file);
 });
+
+/* ---------------- Service worker (hors-ligne) ---------------- */
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
 
 render();
 </script>
