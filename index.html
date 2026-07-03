@@ -133,6 +133,11 @@ select{background:var(--surface-2); color:var(--text); border:1px solid var(--bo
 .field input,.field select{background:var(--surface-2); color:var(--text); border:1px solid var(--border); border-radius:10px; padding:12px 12px; font-size:16px; width:100%; font-family:inherit;}
 .field input:focus,.field select:focus{outline:none; border-color:var(--accent);}
 .hint-box{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:11px 12px; font-size:12.5px; color:var(--muted); margin-bottom:12px;}
+.check{display:flex; align-items:center; gap:9px; margin-bottom:12px; font-size:13.5px; color:var(--text); cursor:pointer;}
+.check input{width:20px; height:20px; accent-color:var(--accent); flex-shrink:0;}
+.bl-list{display:flex; flex-direction:column; gap:8px;}
+.bl-row{display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:11px 12px;}
+.bl-name{font-size:14px; font-weight:600; display:flex; align-items:center; gap:7px;}
 .modal-actions{display:flex; gap:8px; margin-top:4px;}
 .modal-actions .btn{flex:1; padding:13px;}
 
@@ -151,13 +156,16 @@ const KEY = "carnet_paris_v1";
 const MKEY = "carnet_mouvements_v1";
 const BKEY = "carnet_bankrolls_v1";
 const AKEY = "carnet_bankroll_active_v1";
+const LKEY = "carnet_blacklist_v1";
 let bets = [];
 let movements = [];
 let bankrolls = [];
+let blacklist = [];
 let activeBankroll = "Générale";
 try { bets = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ bets = []; }
 try { movements = JSON.parse(localStorage.getItem(MKEY)) || []; } catch(e){ movements = []; }
 try { bankrolls = JSON.parse(localStorage.getItem(BKEY)) || []; } catch(e){ bankrolls = []; }
+try { blacklist = JSON.parse(localStorage.getItem(LKEY)) || []; } catch(e){ blacklist = []; }
 if(!bankrolls.length) bankrolls = ["Générale"];
 try { const a=localStorage.getItem(AKEY); if(a) activeBankroll=a; } catch(e){}
 if(!bankrolls.includes(activeBankroll)) activeBankroll=bankrolls[0];
@@ -174,6 +182,7 @@ function persist(){ try{
   localStorage.setItem(MKEY, JSON.stringify(movements));
   localStorage.setItem(BKEY, JSON.stringify(bankrolls));
   localStorage.setItem(AKEY, activeBankroll);
+  localStorage.setItem(LKEY, JSON.stringify(blacklist));
 }catch(e){} }
 
 const SITES = ["Winamax","Betclic","Unibet","ParionsSport (FDJ)","PMU","Zebet","Vbet","Netbet","Bwin","Genybet"];
@@ -188,6 +197,7 @@ const STATUTS = {
 const BET_TYPES = { simple:"Simple", combine:"Combiné" };
 const MOUV = { depot:{label:"Dépôt",color:"var(--gain)"}, retrait:{label:"Retrait",color:"var(--loss)"}, bonus:{label:"Bonus",color:"var(--accent)"} };
 const PERIODS = { all:"Depuis le début", month:"Ce mois-ci", days30:"30 jours", year:"Cette année" };
+const BL_TYPES = { joueur:"Joueur", equipe:"Équipe" };
 
 let period = "all";
 let filterSite = "all", filterStatut = "all", filterType = "all";
@@ -195,11 +205,13 @@ let filterSite = "all", filterStatut = "all", filterType = "all";
 /* ---------------- Helpers ---------------- */
 function profit(b){
   const m = parseFloat(b.mise)||0, c = parseFloat(b.cote)||0;
-  if(b.statut==="won") return m*(c-1);
-  if(b.statut==="lost") return -m;
-  if(b.statut==="cashout") return (parseFloat(b.cashout)||0)-m;
+  const fb = !!b.freebet;
+  if(b.statut==="won") return m*(c-1);                       // gain = mise × (cote−1), freebet ou non
+  if(b.statut==="lost") return fb ? 0 : -m;                  // freebet perdu : aucune perte réelle
+  if(b.statut==="cashout") return (parseFloat(b.cashout)||0) - (fb ? 0 : m);
   return 0;
 }
+const realStake = b => b.freebet ? 0 : (parseFloat(b.mise)||0);  // argent réel misé (0 pour un freebet)
 const fmt = n => Math.abs(n).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2});
 const eur = n => (n<0?"−":"") + fmt(n) + " €";
 const eurS = n => (n>0?"+":n<0?"−":"") + fmt(n) + " €";
@@ -225,11 +237,11 @@ const movementsPeriod = () => bankMovements().filter(m=>inPeriod(m.date));
 function computeStats(list){
   const settled = list.filter(b=>b.statut!=="pending");
   const pending = list.filter(b=>b.statut==="pending");
-  const totalMise = settled.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
+  const totalMise = settled.reduce((s,b)=>s+realStake(b),0);
   const net = settled.reduce((s,b)=>s+profit(b),0);
   const decided = settled.filter(b=>["won","lost","cashout"].includes(b.statut));
   const winners = settled.filter(b=>profit(b)>0.0001);
-  const engaged = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
+  const engaged = pending.reduce((s,b)=>s+realStake(b),0);
   const potential = pending.reduce((s,b)=>s+(parseFloat(b.mise)||0)*((parseFloat(b.cote)||0)-1),0);
   return {net,totalMise,roi:totalMise>0?net/totalMise*100:0,
     winRate:decided.length?winners.length/decided.length*100:0,
@@ -246,7 +258,7 @@ function computeTreso(){
   const totalBonus = mv.filter(m=>m.type==="bonus").reduce((s,m)=>s+(parseFloat(m.montant)||0),0);
   const settled = bb.filter(b=>b.statut!=="pending");
   const net = settled.reduce((s,b)=>s+profit(b),0);
-  const engaged = bb.filter(b=>b.statut==="pending").reduce((s,b)=>s+(parseFloat(b.mise)||0),0);
+  const engaged = bb.filter(b=>b.statut==="pending").reduce((s,b)=>s+realStake(b),0);
   const soldeTotal = totalDepots + totalBonus - totalRetraits + net - engaged;
   return {totalDepots,totalRetraits,totalBonus,soldeTotal};
 }
@@ -273,7 +285,7 @@ function advanced(list){
 function bySiteTreso(){
   const m={};
   const get=k=>{ if(!m[k]) m[k]={site:k,profit:0,pending:0,depots:0,retraits:0,bonus:0}; return m[k]; };
-  bankBets().forEach(b=>{ const o=get(b.site||"—"); if(b.statut==="pending") o.pending+=parseFloat(b.mise)||0; else o.profit+=profit(b); });
+  bankBets().forEach(b=>{ const o=get(b.site||"—"); if(b.statut==="pending") o.pending+=realStake(b); else o.profit+=profit(b); });
   bankMovements().forEach(mv=>{ const o=get(mv.site||"—");
     if(mv.type==="depot") o.depots+=parseFloat(mv.montant)||0;
     else if(mv.type==="retrait") o.retraits+=parseFloat(mv.montant)||0;
@@ -350,7 +362,7 @@ function render(){
       <p>Ajoute un pari, ou enregistre un dépôt pour démarrer cette bankroll. Tout est stocké sur ton téléphone.</p>
       <button class="btn primary" data-act="add">+ Ajouter un pari</button>
       <div style="height:10px"></div>
-      <button class="btn ghost" data-act="addmvt">+ Dépôt / retrait</button></div>`;
+      <button class="btn ghost" data-act="addmvt">+ Dépôt / retrait</button></div>` + blacklistHTML();
     return;
   }
   fab.style.display="block";
@@ -457,7 +469,7 @@ function render(){
     <div class="bets">${list.length?list.map(betCard).join(""):'<div class="empty-sm">Aucun pari pour ces filtres.</div>'}</div>
   </section>`;
 
-  app.innerHTML = header+bankrollBar+periodBar+hero+cards+metrics+chart+sitesHTML+repHTML+mvtHTML+listHTML;
+  app.innerHTML = header+bankrollBar+periodBar+hero+cards+metrics+chart+sitesHTML+repHTML+mvtHTML+listHTML+blacklistHTML();
 }
 
 function stat(label,value,sub,accent){
@@ -479,6 +491,7 @@ function betCard(b){
   return `<div class="bet">
     <div class="bet-line1">
       <span class="bet-event">${esc(b.event)||"Pari"}</span>
+      ${b.freebet?`<span class="badge" style="color:var(--accent);border-color:var(--accent)">Freebet</span>`:""}
       ${tp==="combine"?`<span class="badge-soft">Combiné${b.selections?" ×"+b.selections:""}</span>`:""}
       <span class="badge" style="color:${st.color};border-color:${st.color}">${st.label}</span>
     </div>
@@ -513,9 +526,50 @@ function mvtCard(mv){
   </div>`;
 }
 
+/* ---------------- Liste noire (globale, passive) ---------------- */
+function blacklistHTML(){
+  const rows = blacklist.length ? blacklist.map(e=>{
+    const t = BL_TYPES[e.type]||"—";
+    return `<div class="bl-row">
+      <div class="bl-main">
+        <div class="bl-name">🚫 <span>${esc(e.name)}</span> <span class="badge-soft">${t}</span></div>
+        ${e.reason?`<div class="site-sub">${esc(e.reason)}</div>`:""}
+      </div>
+      <button class="icon-btn" data-bldel="${e.id}">✕</button>
+    </div>`;
+  }).join("") : `<div class="empty-sm">Personne ici pour le moment</div>`;
+  return `<section class="panel">
+    <div class="panel-head"><h2>Liste noire</h2>
+      <button class="mini" data-act="addbl">+ Ajouter</button></div>
+    <div class="bl-list">${rows}</div>
+  </section>`;
+}
+function openBlacklistModal(){
+  const ov=document.createElement("div"); ov.className="overlay";
+  const typeOpts=Object.entries(BL_TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+  ov.innerHTML=`<div class="modal">
+    <div class="modal-head"><h3>Ajouter à la liste noire</h3><button class="icon-btn" data-close>✕</button></div>
+    <label class="field"><span class="field-label">Nom (joueur ou équipe)</span><input id="bl-name" placeholder=""></label>
+    <label class="field"><span class="field-label">Type</span><select id="bl-type">${typeOpts}</select></label>
+    <label class="field"><span class="field-label">Raison (facultatif)</span><input id="bl-reason" placeholder=""></label>
+    <div class="modal-actions">
+      <button class="btn ghost" data-close>Annuler</button>
+      <button class="btn primary" id="bl-save">Ajouter</button>
+    </div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelectorAll("[data-close]").forEach(el=>el.onclick=()=>ov.remove());
+  ov.onclick=e=>{ if(e.target===ov) ov.remove(); };
+  ov.querySelector("#bl-save").onclick=()=>{
+    const name=ov.querySelector("#bl-name").value.trim();
+    if(!name){ alert("Renseigne un nom."); return; }
+    blacklist.push({id:uid(), name, type:ov.querySelector("#bl-type").value, reason:ov.querySelector("#bl-reason").value.trim()});
+    persist(); ov.remove(); render();
+  };
+}
+
 /* ---------------- Modale pari ---------------- */
 function openModal(existing){
-  const b = existing || {date:new Date().toISOString().slice(0,10),site:SITES[0],sport:SPORTS[0],event:"",mise:"",cote:"",statut:"pending",cashout:"",type:"simple",selections:"",bankroll:activeBankroll};
+  const b = existing || {date:new Date().toISOString().slice(0,10),site:SITES[0],sport:SPORTS[0],event:"",mise:"",cote:"",statut:"pending",cashout:"",type:"simple",selections:"",bankroll:activeBankroll,freebet:false};
   const bankOpts = bankrolls.map(x=>`<option ${(b.bankroll||activeBankroll)===x?"selected":""}>${esc(x)}</option>`).join("");
   const isCustom = b.site && !SITES.includes(b.site);
   const siteOpts = SITES.map(s=>`<option ${b.site===s?"selected":""}>${s}</option>`).join("")+`<option value="__custom__" ${isCustom?"selected":""}>Autre…</option>`;
@@ -547,6 +601,7 @@ function openModal(existing){
     </div>
     <label class="field"><span class="field-label">Statut</span><select id="f-statut">${statOpts}</select></label>
     <label class="field" id="wrap-cash" style="display:${b.statut==="cashout"?"flex":"none"}"><span class="field-label">Montant récupéré (€)</span><input type="number" inputmode="decimal" step="0.01" min="0" id="f-cash" value="${b.cashout||""}" placeholder="14.50"></label>
+    <label class="check"><input type="checkbox" id="f-freebet" ${b.freebet?"checked":""}><span>Pari freebet (mise non rendue, aucune perte si raté)</span></label>
     <div class="hint-box" id="hint" style="display:none"></div>
     <div class="modal-actions">
       <button class="btn ghost" data-close>Annuler</button>
@@ -556,17 +611,21 @@ function openModal(existing){
   document.body.appendChild(ov);
 
   const $=id=>ov.querySelector(id);
-  const siteSel=$("#f-site"), customWrap=$("#wrap-custom"), statSel=$("#f-statut"), cashWrap=$("#wrap-cash"), hint=$("#hint"), typeSel=$("#f-type"), selWrap=$("#wrap-sel"), coteLabel=$("#f-cote").previousElementSibling;
+  const siteSel=$("#f-site"), customWrap=$("#wrap-custom"), statSel=$("#f-statut"), cashWrap=$("#wrap-cash"), hint=$("#hint"), typeSel=$("#f-type"), selWrap=$("#wrap-sel"), fbChk=$("#f-freebet");
   const refreshHint=()=>{
     const m=parseFloat($("#f-mise").value)||0, c=parseFloat($("#f-cote").value)||0;
     if(m&&c&&statSel.value==="pending"){
       hint.style.display="block";
-      hint.innerHTML=`Gain potentiel : <b style="color:var(--gain)">${eurS(m*(c-1))}</b> · Retour total <b>${eur(m*c)}</b>`;
+      if(fbChk.checked)
+        hint.innerHTML=`Freebet · Gain potentiel : <b style="color:var(--gain)">${eurS(m*(c-1))}</b> <span style="opacity:.7">(mise non rendue)</span>`;
+      else
+        hint.innerHTML=`Gain potentiel : <b style="color:var(--gain)">${eurS(m*(c-1))}</b> · Retour total <b>${eur(m*c)}</b>`;
     } else hint.style.display="none";
   };
   siteSel.onchange=()=>{ customWrap.style.display=siteSel.value==="__custom__"?"flex":"none"; };
   statSel.onchange=()=>{ cashWrap.style.display=statSel.value==="cashout"?"flex":"none"; refreshHint(); };
   typeSel.onchange=()=>{ const c=typeSel.value==="combine"; selWrap.style.display=c?"flex":"none"; };
+  fbChk.onchange=refreshHint;
   $("#f-mise").oninput=refreshHint; $("#f-cote").oninput=refreshHint;
   refreshHint();
 
@@ -584,7 +643,7 @@ function openModal(existing){
       event:$("#f-event").value.trim(), mise, cote,
       statut:statSel.value, cashout:statSel.value==="cashout"?$("#f-cash").value:"",
       type, selections: type==="combine" ? ($("#f-sel").value||"") : "",
-      bankroll: $("#f-bank").value
+      bankroll: $("#f-bank").value, freebet: fbChk.checked
     };
     if(existing) bets=bets.map(x=>x.id===existing.id?rec:x);
     else bets.push(rec);
@@ -712,6 +771,8 @@ document.getElementById("app").addEventListener("click",e=>{
   if(t.dataset.period){ period=t.dataset.period; render(); return; }
   if(t.dataset.act==="add") openModal(null);
   if(t.dataset.act==="managebank") openManageBank();
+  if(t.dataset.act==="addbl") openBlacklistModal();
+  if(t.dataset.bldel){ blacklist=blacklist.filter(x=>x.id!==t.dataset.bldel); persist(); render(); }
   if(t.dataset.act==="addmvt") openMouv(null);
   if(t.dataset.act==="export") exportJSON();
   if(t.dataset.act==="csv") exportCSV();
@@ -737,7 +798,7 @@ document.getElementById("app").addEventListener("change",e=>{
 
 /* ---------------- Export / import ---------------- */
 function exportJSON(){
-  const payload={version:4, exportedAt:new Date().toISOString(), bankrolls, activeBankroll, bets, movements};
+  const payload={version:5, exportedAt:new Date().toISOString(), bankrolls, activeBankroll, bets, movements, blacklist};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
   const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
@@ -746,9 +807,9 @@ function exportJSON(){
 }
 function exportCSV(){
   const q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
-  const head=["Bankroll","Date","Bookmaker","Sport","Type","Evenement","Mise","Cote","Statut","Profit"];
+  const head=["Bankroll","Date","Bookmaker","Sport","Type","Freebet","Evenement","Mise","Cote","Statut","Profit"];
   const rows=bets.slice().sort((a,b)=>new Date(a.date)-new Date(b.date)).map(b=>[
-    b.bankroll||"Générale",b.date,b.site,b.sport||"",BET_TYPES[betType(b)],b.event||"",
+    b.bankroll||"Générale",b.date,b.site,b.sport||"",BET_TYPES[betType(b)],b.freebet?"Oui":"Non",b.event||"",
     (parseFloat(b.mise)||0).toFixed(2),(parseFloat(b.cote)||0).toFixed(2),
     (STATUTS[b.statut]||{}).label||b.statut, profit(b).toFixed(2)
   ]);
@@ -777,6 +838,7 @@ document.getElementById("importFile").addEventListener("change",e=>{
       }
       if(confirm(`Importer ${newBets.length} pari(s), ${newMvts.length} mouvement(s) et ${newBanks.length} bankroll(s) ? Cela remplace les données actuelles.`)){
         bets=newBets; movements=newMvts; bankrolls=newBanks;
+        blacklist = (data && Array.isArray(data.blacklist)) ? data.blacklist : blacklist;
         activeBankroll = (data && data.activeBankroll && newBanks.includes(data.activeBankroll)) ? data.activeBankroll : newBanks[0];
         resetFilters(); persist(); render();
       }
